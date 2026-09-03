@@ -69,7 +69,7 @@ REGRAS:
 def obter_gemini_api_key() -> Optional[str]:
     """Obtém a API Key do Gemini."""
 
-    ```
+    ``
     try:
         if "GEMINI_API_KEY" in st.secrets:
             chave = str(st.secrets["GEMINI_API_KEY"]).strip()

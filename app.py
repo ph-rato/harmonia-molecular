@@ -67,30 +67,30 @@ REGRAS:
 # ============================================================================
 
 def obter_gemini_api_key() -> Optional[str]:
-"""Obtém a API Key do Gemini."""
+    """Obtém a API Key do Gemini."""
 
-```
-try:
-    if "GEMINI_API_KEY" in st.secrets:
-        chave = str(st.secrets["GEMINI_API_KEY"]).strip()
+    ```
+    try:
+        if "GEMINI_API_KEY" in st.secrets:
+            chave = str(st.secrets["GEMINI_API_KEY"]).strip()
 
-        if chave:
-            return chave
+            if chave:
+                return chave
 
-    if "GOOGLE_API_KEY" in st.secrets:
-        chave = str(st.secrets["GOOGLE_API_KEY"]).strip()
+        if "GOOGLE_API_KEY" in st.secrets:
+            chave = str(st.secrets["GOOGLE_API_KEY"]).strip()
 
-        if chave:
-            return chave
+            if chave:
+                return chave
 
-except Exception:
-    pass
+    except Exception:
+        pass
 
-return (
-    os.environ.get("GEMINI_API_KEY")
-    or os.environ.get("GOOGLE_API_KEY")
-)
-```
+    return (
+        os.environ.get("GEMINI_API_KEY")
+        or os.environ.get("GOOGLE_API_KEY")
+    )
+    ```
 
 # ============================================================================
 

@@ -1023,11 +1023,3 @@ st.info(
     "Escolha uma combinação de exemplo ou digite dois ingredientes "
     "em inglês para começar."
 )
-```
-
-```
-
-**Agora é literalmente esse bloco inteiro e nada além dele.** Não copie o texto que está antes/depois do bloco.
-
-Depois do commit, o erro de `invalid character '→'` deve desaparecer. Se surgir outro erro, **manda o erro exatamente como aparecer** — aí a gente passa para o próximo problema, provavelmente o FlavorDB.
-```

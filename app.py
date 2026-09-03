@@ -74,7 +74,7 @@ generalidades.
 6. Se a combinação for desafiadora, proponha caminhos de equilíbrio em vez de descartá-la."""
 
 SETUP_API_KEY_MD: str = ""
-Obtenha uma chave gratuita no **[Google AI Studio](https://aistudio.google.com/apikey)** e:
+Obtenha uma chave gratuita no [Google AI Studio](https://aistudio.google.com/apikey) e:
 
 **Execução local** crie o arquivo .streamlit/secrets.toml na raiz do projeto:
 

@@ -76,7 +76,7 @@ generalidades.
 SETUP_API_KEY_MD: str = ""
 Obtenha uma chave gratuita no **[Google AI Studio](https://aistudio.google.com/apikey)** e:
 
-**Execução local** — crie o arquivo `.streamlit/secrets.toml` na raiz do projeto:
+**Execução local** — crie o arquivo .streamlit/secrets.toml na raiz do projeto:
 
 ```toml
 GEMINI_API_KEY = "SUA_CHAVE_AQUI"

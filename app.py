@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
-from typing import Optional, Dict, Any, List, Set, Tuple
+from typing import Optional, Dict, Any, List, Set
 
 import pandas as pd
 import requests
@@ -76,7 +76,7 @@ SETUP_API_KEY_MD = """
 
 Você pode obter uma chave no Google AI Studio.
 
-No **Streamlit Cloud**, vá em:
+No Streamlit Cloud, vá em:
 
 **Settings → Secrets**
 
@@ -118,7 +118,6 @@ try:
             return chave
 
 except Exception:
-    # Fora do Streamlit ou quando secrets.toml não existe.
     pass
 
 return (
@@ -149,7 +148,6 @@ if isinstance(data, list):
 if not isinstance(data, dict):
     return []
 
-# Formatos possíveis.
 for chave in ("entities", "data", "results"):
 
     valor = data.get(chave)
@@ -164,7 +162,6 @@ for chave in ("entities", "data", "results"):
     if isinstance(valor, dict):
         return [valor]
 
-# Caso a própria resposta seja uma entidade.
 if any(
     chave in data
     for chave in (
@@ -199,6 +196,7 @@ for chave in (
     "molecule_name",
     "compound_name",
 ):
+
     valor = composto.get(chave)
 
     if valor:
@@ -209,7 +207,7 @@ return None
 
 def extrair_moleculas(entidade: Dict[str, Any]) -> Set[str]:
 """
-Extrai moléculas/compostos aromáticos de uma entidade.
+Extrai moléculas ou compostos aromáticos de uma entidade.
 """
 
 ```
@@ -349,7 +347,6 @@ entidades = extrair_entidades(data)
 if not entidades:
     return None
 
-# Procuramos a primeira entidade que contenha moléculas.
 entidade_escolhida = None
 
 for entidade in entidades:
@@ -360,8 +357,6 @@ for entidade in entidades:
         entidade_escolhida = entidade
         break
 
-# Se nenhuma tiver moléculas, usamos a primeira para permitir
-# diagnóstico do perfil.
 if entidade_escolhida is None:
     entidade_escolhida = entidades[0]
 
@@ -571,6 +566,7 @@ Diga se considera a combinação:
 e explique brevemente o motivo.
 
 IMPORTANTE:
+
 O índice de Jaccard é apenas um indicador de similaridade entre os
 conjuntos de compostos fornecidos. Ele não representa, sozinho, a qualidade
 gastronômica da combinação.
@@ -652,8 +648,6 @@ st.stop()
 
 st.subheader("🥘 Escolha os ingredientes")
 
-# Inicialização do estado.
-
 if "ingrediente_1" not in st.session_state:
 st.session_state.ingrediente_1 = "coffee"
 
@@ -666,26 +660,35 @@ if col_ex1.button(
 EXEMPLOS[0][0],
 use_container_width=True,
 ):
+
+```
 st.session_state.ingrediente_1 = EXEMPLOS[0][1]
 st.session_state.ingrediente_2 = EXEMPLOS[0][2]
+```
 
 if col_ex2.button(
 EXEMPLOS[1][0],
 use_container_width=True,
 ):
+
+```
 st.session_state.ingrediente_1 = EXEMPLOS[1][1]
 st.session_state.ingrediente_2 = EXEMPLOS[1][2]
+```
 
 if col_ex3.button(
 EXEMPLOS[2][0],
 use_container_width=True,
 ):
+
+```
 st.session_state.ingrediente_1 = EXEMPLOS[2][1]
 st.session_state.ingrediente_2 = EXEMPLOS[2][2]
+```
 
 # ============================================================================
 
-# CAMPOS
+# CAMPOS DE INGREDIENTES
 
 # ============================================================================
 
@@ -713,7 +716,7 @@ ing2 = st.text_input(
 
 # ============================================================================
 
-# BOTÃO DE ANÁLISE
+# ANÁLISE
 
 # ============================================================================
 
@@ -737,7 +740,7 @@ if not ing1 or not ing2:
 
 
 # ------------------------------------------------------------------------
-# BUSCA FLAVORDB
+# CONSULTA FLAVORDB
 # ------------------------------------------------------------------------
 
 with st.spinner(
@@ -775,12 +778,22 @@ if not dados2:
     st.stop()
 
 
+st.success(
+    "✅ Dados dos ingredientes carregados."
+)
+
+
 # ------------------------------------------------------------------------
 # DADOS MOLECULARES
 # ------------------------------------------------------------------------
 
-moleculas1 = set(dados1.get("moleculas", []))
-moleculas2 = set(dados2.get("moleculas", []))
+moleculas1 = set(
+    dados1.get("moleculas", [])
+)
+
+moleculas2 = set(
+    dados2.get("moleculas", [])
+)
 
 compartilhadas = sorted(
     moleculas1 & moleculas2
@@ -792,13 +805,8 @@ jaccard = calcular_jaccard(
 )
 
 
-st.success(
-    "✅ Dados dos ingredientes carregados."
-)
-
-
 # ------------------------------------------------------------------------
-# RESUMO
+# MÉTRICAS
 # ------------------------------------------------------------------------
 
 st.subheader("📊 Resultado da análise")
@@ -832,7 +840,7 @@ st.progress(
 
 
 # ------------------------------------------------------------------------
-# PERFIS
+# INGREDIENTE 1
 # ------------------------------------------------------------------------
 
 col_d1, col_d2 = st.columns(2)
@@ -844,17 +852,24 @@ with col_d1:
         f"### 🧪 {ing1.title()}"
     )
 
-    perfil1 = dados1.get("perfil", [])
+    perfil1 = dados1.get(
+        "perfil",
+        [],
+    )
 
     if perfil1:
+
         st.write(
             "**Perfil aromático:**",
             ", ".join(perfil1),
         )
+
     else:
+
         st.write(
             "**Perfil aromático:** Não informado"
         )
+
 
     if moleculas1:
 
@@ -865,7 +880,9 @@ with col_d1:
         st.dataframe(
             pd.DataFrame(
                 sorted(moleculas1),
-                columns=["Composto aromático"],
+                columns=[
+                    "Composto aromático"
+                ],
             ),
             hide_index=True,
             use_container_width=True,
@@ -878,23 +895,34 @@ with col_d1:
         )
 
 
+# ------------------------------------------------------------------------
+# INGREDIENTE 2
+# ------------------------------------------------------------------------
+
 with col_d2:
 
     st.markdown(
         f"### 🧪 {ing2.title()}"
     )
 
-    perfil2 = dados2.get("perfil", [])
+    perfil2 = dados2.get(
+        "perfil",
+        [],
+    )
 
     if perfil2:
+
         st.write(
             "**Perfil aromático:**",
             ", ".join(perfil2),
         )
+
     else:
+
         st.write(
             "**Perfil aromático:** Não informado"
         )
+
 
     if moleculas2:
 
@@ -905,7 +933,9 @@ with col_d2:
         st.dataframe(
             pd.DataFrame(
                 sorted(moleculas2),
-                columns=["Composto aromático"],
+                columns=[
+                    "Composto aromático"
+                ],
             ),
             hide_index=True,
             use_container_width=True,
@@ -933,13 +963,15 @@ if compartilhadas:
 
     st.write(
         f"Foram encontradas **{len(compartilhadas)} "
-        "moléculas compartilhadas** entre os dois ingredientes."
+        "moléculas compartilhadas entre os dois ingredientes."
     )
 
     st.dataframe(
         pd.DataFrame(
             compartilhadas,
-            columns=["Composto aromático compartilhado"],
+            columns=[
+                "Composto aromático compartilhado"
+            ],
         ),
         hide_index=True,
         use_container_width=True,
@@ -995,29 +1027,7 @@ st.info(
 
 ```
 
-### Depois de substituir
+**Agora é literalmente esse bloco inteiro e nada além dele.** Não copie o texto que está antes/depois do bloco.
 
-No GitHub, faça:
-
-**`app.py` → Edit → apaga tudo → cola o código acima → Commit changes.**
-
-O seu repositório atualmente tem justamente `app.py` e `requirements.txt` na raiz, então não precisa mudar a estrutura do projeto.
-
-Depois, no Streamlit Cloud:
-
-**Manage app → Reboot app**
-
-E deixe o `requirements.txt` como está — ele já contém `streamlit`, `requests`, `google-genai` e `pandas`.
-
-### ⚠️ Uma coisa importante
-
-Se depois disso o aplicativo **abrir**, mas aparecer algo como:
-
-> "Não encontrei dados para strawberry no FlavorDB"
-
-**não mexa no código ainda.**
-
-Isso significará que passamos da primeira barreira — Python/Streamlit/Gemini — e o problema estará especificamente na integração com o FlavorDB2. Aí eu ajusto essa parte com você.
-
-Se aparecer **qualquer erro vermelho**, me manda exatamente o erro. A partir desse código, ele já vai estar muito mais fácil de diagnosticar.
+Depois do commit, o erro de `invalid character '→'` deve desaparecer. Se surgir outro erro, **manda o erro exatamente como aparecer** — aí a gente passa para o próximo problema, provavelmente o FlavorDB.
 ```

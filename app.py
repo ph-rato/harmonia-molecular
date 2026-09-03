@@ -1,4 +1,3 @@
-python
 # -*- coding: utf-8 -*-
 
 import os
@@ -10,42 +9,33 @@ import streamlit as st
 from google import genai
 from google.genai import types
 
-
 # ============================================================================
-# CONFIGURAÇÃO DO STREAMLIT
+
+# CONFIGURAÇÃO
+
 # ============================================================================
 
 st.set_page_config(
-    page_title="Harmonia Molecular",
-    page_icon="🧪",
-    layout="wide",
+page_title="Harmonia Molecular",
+page_icon="🧪",
+layout="wide",
 )
 
-
-# ============================================================================
-# CONFIGURAÇÕES
-# ============================================================================
-
 FLAVORDB_API_URL = "https://flavordb2.com/api/v1/entities"
-
 GEMINI_MODEL = "gemini-2.5-flash"
-
 REQUEST_TIMEOUT = 20
-
 MAX_MOLECULES = 15
 
 HTTP_HEADERS = {
-    "Accept": "application/json",
-    "User-Agent": "HarmoniaMolecular/1.0",
+"Accept": "application/json",
+"User-Agent": "HarmoniaMolecular/1.0",
 }
 
-
 EXEMPLOS = [
-    ("🍓 Morango × Manjericão", "strawberry", "basil"),
-    ("☕ Café × Maracujá", "coffee", "passion fruit"),
-    ("🍫 Chocolate × Laranja", "chocolate", "orange"),
+("🍓 Morango × Manjericão", "strawberry", "basil"),
+("☕ Café × Maracujá", "coffee", "passion fruit"),
+("🍫 Chocolate × Laranja", "chocolate", "orange"),
 ]
-
 
 CHEF_SYSTEM_PROMPT = """
 Você é o Chef Tradutor: especialista em gastronomia, ciência de aromas,
@@ -66,28 +56,9 @@ REGRAS:
 7. Seja específico nas sugestões culinárias.
 8. Ao sugerir um prato, indique técnicas culinárias, temperatura aproximada,
    textura e formato de serviço.
-9. Lembre que moléculas compartilhadas sugerem uma possível ponte aromática,
-   mas não garantem, sozinhas, que dois ingredientes sejam agradáveis juntos.
-"""
-
-
-SETUP_API_KEY_MD = """
-### 🔑 Configure sua API Key do Gemini
-
-Você pode obter uma chave no Google AI Studio.
-
-No Streamlit Cloud, vá em:
-
-**Settings → Secrets**
-
-e adicione:
-
-```toml
-GEMINI_API_KEY = "SUA_CHAVE_AQUI"
-````
-
-Depois salve e reinicie o aplicativo.
-"""
+9. Moléculas compartilhadas sugerem uma possível ponte aromática, mas não
+   garantem, sozinhas, que dois ingredientes sejam agradáveis juntos.
+   """
 
 # ============================================================================
 
@@ -96,14 +67,9 @@ Depois salve e reinicie o aplicativo.
 # ============================================================================
 
 def obter_gemini_api_key() -> Optional[str]:
-"""
-Obtém a API Key do Gemini.
+"""Obtém a API Key do Gemini."""
 
 ```
-Primeiro procura nos Secrets do Streamlit.
-Depois procura nas variáveis de ambiente.
-"""
-
 try:
     if "GEMINI_API_KEY" in st.secrets:
         chave = str(st.secrets["GEMINI_API_KEY"]).strip()
@@ -133,9 +99,7 @@ return (
 # ============================================================================
 
 def extrair_entidades(data: Any) -> List[Dict[str, Any]]:
-"""
-Normaliza diferentes formatos possíveis de resposta da API.
-"""
+"""Normaliza diferentes formatos possíveis de resposta da API."""
 
 ```
 if isinstance(data, list):
@@ -177,14 +141,11 @@ return []
 ```
 
 def extrair_nome_composto(composto: Any) -> Optional[str]:
-"""
-Tenta encontrar o nome de um composto em diferentes formatos.
-"""
+"""Tenta encontrar o nome de um composto."""
 
 ```
 if isinstance(composto, str):
     nome = composto.strip()
-
     return nome if nome else None
 
 if not isinstance(composto, dict):
@@ -206,9 +167,7 @@ return None
 ```
 
 def extrair_moleculas(entidade: Dict[str, Any]) -> Set[str]:
-"""
-Extrai moléculas ou compostos aromáticos de uma entidade.
-"""
+"""Extrai moléculas ou compostos aromáticos de uma entidade."""
 
 ```
 moleculas: Set[str] = set()
@@ -241,9 +200,7 @@ return moleculas
 ```
 
 def extrair_perfil(entidade: Dict[str, Any]) -> List[str]:
-"""
-Extrai o perfil sensorial/aromático.
-"""
+"""Extrai o perfil sensorial/aromático."""
 
 ```
 possiveis_chaves = (
@@ -292,9 +249,7 @@ return []
 def buscar_dados_flavordb(
 ingrediente: str,
 ) -> Optional[Dict[str, Any]]:
-"""
-Consulta o FlavorDB2 e retorna dados normalizados.
-"""
+"""Consulta o FlavorDB2 e retorna dados normalizados."""
 
 ```
 ingrediente_limpo = ingrediente.strip().lower()
@@ -312,7 +267,6 @@ try:
     )
 
     response.raise_for_status()
-
     data = response.json()
 
 except requests.RequestException as exc:
@@ -361,7 +315,6 @@ if entidade_escolhida is None:
     entidade_escolhida = entidades[0]
 
 moleculas = extrair_moleculas(entidade_escolhida)
-
 perfil = extrair_perfil(entidade_escolhida)
 
 return {
@@ -381,9 +334,7 @@ def calcular_jaccard(
 moleculas_a: Set[str],
 moleculas_b: Set[str],
 ) -> float:
-"""
-Calcula o índice de Jaccard entre dois conjuntos.
-"""
+"""Calcula o índice de Jaccard entre dois conjuntos."""
 
 ```
 uniao = moleculas_a | moleculas_b
@@ -401,10 +352,7 @@ dados_ing1: Dict[str, Any],
 dados_ing2: Dict[str, Any],
 api_key: str,
 ) -> str:
-"""
-Envia os dados moleculares para o Gemini e solicita
-uma interpretação gastronômica.
-"""
+"""Envia os dados moleculares para o Gemini."""
 
 ```
 moleculas_1 = set(dados_ing1.get("moleculas", []))
@@ -495,10 +443,9 @@ Moléculas compartilhadas:
 TAREFA
 ======
 
-Produza uma análise gastronômica estruturada exatamente nos seguintes
-tópicos:
+Produza uma análise gastronômica estruturada nos seguintes tópicos:
 
-## 1. 🧬 Sinergia Molecular e Perfil Aromático
+## 1. Sinergia Molecular e Perfil Aromático
 
 Explique quais compostos podem funcionar como pontes aromáticas entre os
 ingredientes.
@@ -510,7 +457,7 @@ pode funcionar através de complementaridade sensorial.
 
 Não invente compostos.
 
-## 2. 👅 Equilíbrio de Sabores
+## 2. Equilíbrio de Sabores
 
 Analise:
 
@@ -525,7 +472,7 @@ Analise:
 
 Explique possíveis desequilíbrios e como corrigi-los.
 
-## 3. 👨‍🍳 Aplicação Técnica
+## 3. Aplicação Técnica
 
 Explique quais técnicas culinárias podem favorecer a combinação.
 
@@ -542,7 +489,7 @@ Considere, quando fizer sentido:
 * temperatura de serviço
 * textura
 
-## 4. 🍽️ Prato Proposto
+## 4. Prato Proposto
 
 Crie uma proposta de prato utilizando os dois ingredientes.
 
@@ -557,18 +504,18 @@ Informe:
 * montagem
 * formato de serviço
 
-## 5. 💡 Conclusão
+## 5. Conclusão
 
 Diga se considera a combinação:
 
-**muito promissora, promissora, interessante ou desafiadora**
+muito promissora, promissora, interessante ou desafiadora
 
 e explique brevemente o motivo.
 
 IMPORTANTE:
 
-O índice de Jaccard é apenas um indicador de similaridade entre os
-conjuntos de compostos fornecidos. Ele não representa, sozinho, a qualidade
+O índice de Jaccard é apenas um indicador de similaridade entre os conjuntos
+de compostos fornecidos. Ele não representa, sozinho, a qualidade
 gastronômica da combinação.
 """
 
@@ -594,17 +541,17 @@ try:
         return texto
 
     return (
-        "⚠️ O Gemini recebeu a solicitação, "
+        "O Gemini recebeu a solicitação, "
         "mas não retornou texto."
     )
 
 except Exception as exc:
 
     return (
-        "⚠️ **Erro ao consultar o Gemini.**\n\n"
-        f"`{exc}`\n\n"
+        "Erro ao consultar o Gemini.\n\n"
+        f"{exc}\n\n"
         "Verifique se a API Key está correta e se o modelo "
-        f"`{GEMINI_MODEL}` está disponível para sua chave."
+        f"{GEMINI_MODEL} está disponível para sua chave."
     )
 ```
 
@@ -632,11 +579,30 @@ if not api_key:
 
 ```
 st.warning(
-    "⚠️ A API Key do Gemini não foi configurada."
+    "A API Key do Gemini não foi configurada."
 )
 
-st.markdown(SETUP_API_KEY_MD)
+st.markdown(
+    """
+```
 
+### Configure sua API Key do Gemini
+
+No Streamlit Cloud, vá em:
+
+**Settings → Secrets**
+
+Adicione:
+
+```toml
+GEMINI_API_KEY = "SUA_CHAVE_AQUI"
+```
+
+Depois salve e reinicie o aplicativo.
+"""
+)
+
+```
 st.stop()
 ```
 
@@ -739,10 +705,6 @@ if not ing1 or not ing2:
     st.stop()
 
 
-# ------------------------------------------------------------------------
-# CONSULTA FLAVORDB
-# ------------------------------------------------------------------------
-
 with st.spinner(
     "🧪 Consultando os compostos aromáticos..."
 ):
@@ -754,12 +716,12 @@ with st.spinner(
 if not dados1:
 
     st.error(
-        f"Não encontrei dados para **{ing1}** no FlavorDB."
+        f"Não encontrei dados para {ing1} no FlavorDB."
     )
 
     st.info(
         "Tente utilizar o nome do ingrediente em inglês. "
-        "Ex.: `strawberry`, `coffee`, `orange`."
+        "Ex.: strawberry, coffee, orange."
     )
 
     st.stop()
@@ -768,7 +730,7 @@ if not dados1:
 if not dados2:
 
     st.error(
-        f"Não encontrei dados para **{ing2}** no FlavorDB."
+        f"Não encontrei dados para {ing2} no FlavorDB."
     )
 
     st.info(
@@ -779,7 +741,7 @@ if not dados2:
 
 
 st.success(
-    "✅ Dados dos ingredientes carregados."
+    "Dados dos ingredientes carregados."
 )
 
 
@@ -962,7 +924,7 @@ st.subheader(
 if compartilhadas:
 
     st.write(
-        f"Foram encontradas **{len(compartilhadas)} "
+        f"Foram encontradas {len(compartilhadas)} "
         "moléculas compartilhadas entre os dois ingredientes."
     )
 
@@ -1010,12 +972,6 @@ with st.spinner(
 st.markdown(resultado_ia)
 ```
 
-# ============================================================================
-
-# ESTADO INICIAL
-
-# ============================================================================
-
 else:
 
 ```
@@ -1023,3 +979,4 @@ st.info(
     "Escolha uma combinação de exemplo ou digite dois ingredientes "
     "em inglês para começar."
 )
+```
